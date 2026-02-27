@@ -7,17 +7,12 @@ if(!isset($_SESSION["user_id"]) || $_SESSION["rol"] != "musteri"){
 }
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Müşteri Paneli</title>
-</head>
-<body>
+<?php include("../includes/header.php"); ?>
+<?php include("../includes/sidebar.php"); ?>
 
-<h2>Müşteri Dashboard</h2>
-<p>Hoşgeldiniz 👋</p>
+<div class="content-wrapper p-3">
+    <h2>Müşteri Dashboard</h2>
+    <p>Hoşgeldiniz 👋</p>
+</div>
 
-<a href="../logout.php">Çıkış Yap</a>
-
-</body>
-</html>
+<?php include("../includes/footer.php"); ?>

@@ -1,39 +1,69 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+// Session ayarları
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'httponly' => true
+]);
+
 session_start();
 
 include("includes/baglanti.php");
+/** @var mysqli $conn */
+
+$hata = "";
 
 if(isset($_POST["giris"])){
 
-    $email = $_POST["email"];
+    $email = trim($_POST["email"]);
     $sifre = $_POST["sifre"];
 
-    $sql = "SELECT * FROM kullanicilar WHERE email='$email' AND sifre='$sifre'";
-    $sonuc = mysqli_query($conn, $sql);
+    $stmt = $conn->prepare("SELECT * FROM kullanicilar WHERE email=?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if(mysqli_num_rows($sonuc) == 1){
+    if($result->num_rows === 1){
 
-        $row = mysqli_fetch_assoc($sonuc);
+        $row = $result->fetch_assoc();
 
-        $_SESSION["user_id"] = $row["id"];
-        $_SESSION["rol"] = $row["rol"];
+        if(password_verify($sifre, $row["sifre"])){
 
-        if($row["rol"] == "admin"){
-            header("Location: admin/dashboard.php");
+            // Güvenlik için session yenile
+            session_regenerate_id(true);
+
+            $_SESSION["user_id"] = $row["id"];
+            $_SESSION["rol"] = $row["rol"];
+
+            // Rol bazlı yönlendirme
+            switch($row["rol"]){
+                case "admin":
+                    header("Location: /arac-servis-randevu/admin/dashboard.php");
+                    break;
+
+                case "servis":
+                    header("Location: /arac-servis-randevu/servis/dashboard.php");
+                    break;
+
+                case "musteri":
+                    header("Location: /arac-servis-randevu/musteri/dashboard.php");
+                    break;
+
+                default:
+                    header("Location: login.php");
+            }
+
+            exit;
+
+        } else {
+            $hata = "Hatalı şifre!";
         }
-        elseif($row["rol"] == "servis"){
-            header("Location: servis/dashboard.php");
-        }
-        elseif($row["rol"] == "musteri"){
-            header("Location: musteri/dashboard.php");
-        }
-
-        exit;
 
     } else {
-        $hata = "Hatalı giriş!";
+        $hata = "Kullanıcı bulunamadı!";
     }
 }
 ?>
@@ -59,6 +89,9 @@ if(isset($hata)){
 
     Şifre:<br>
     <input type="password" name="sifre" required><br><br>
+
+    <br>
+    <a href="sifremi_unuttum.php">Şifremi Unuttum</a>
 
     <button type="submit" name="giris">Giriş Yap</button>
 </form>

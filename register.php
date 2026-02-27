@@ -4,25 +4,30 @@ ini_set('display_errors', 1);
 session_start();
 
 include("includes/baglanti.php");
+/** @var mysqli $conn */
 
 if(isset($_POST["kayit"])){
 
     $ad = $_POST["ad"];
     $email = $_POST["email"];
     $sifre = $_POST["sifre"];
+    $sifre_hashli = password_hash($sifre, PASSWORD_DEFAULT);
 
-    // Email zaten var mı kontrolü
-    $kontrol = "SELECT * FROM kullanicilar WHERE email='$email'";
-    $sonuc = mysqli_query($conn, $kontrol);
+    // Email kontrol (GÜVENLİ)
+    $stmt = $conn->prepare("SELECT id FROM kullanicilar WHERE email=?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $kontrol = $stmt->get_result();
 
-    if(mysqli_num_rows($sonuc) > 0){
+    if($kontrol->num_rows > 0){
         $hata = "Bu email zaten kayıtlı!";
     } else {
 
-        $sql = "INSERT INTO kullanicilar (ad, email, sifre, rol)
-                VALUES ('$ad', '$email', '$sifre', 'musteri')";
+        // INSERT (GÜVENLİ + HASHLİ)
+        $stmt = $conn->prepare("INSERT INTO kullanicilar (ad, email, sifre, rol) VALUES (?, ?, ?, 'servis')");
+        $stmt->bind_param("sss", $ad, $email, $sifre_hashli);
 
-        if(mysqli_query($conn, $sql)){
+        if($stmt->execute()){
             $basarili = "Kayıt başarılı! Giriş yapabilirsiniz.";
         } else {
             $hata = "Kayıt sırasında hata oluştu!";
