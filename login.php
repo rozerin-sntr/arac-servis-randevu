@@ -30,8 +30,7 @@ if(isset($_POST["giris"])){
 
         $row = $result->fetch_assoc();
 
-        if(password_verify($sifre, $row["sifre"])){
-
+       if($sifre == $row["sifre"]){
             // Güvenlik için session yenile
             session_regenerate_id(true);
 
@@ -69,32 +68,84 @@ if(isset($_POST["giris"])){
 ?>
 
 <!DOCTYPE html>
-<html>
+
+<html lang="tr">
 <head>
-    <title>Login</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giriş Yap | Araç Servis Sistemi</title>
+<link rel="stylesheet" href="">
+<link rel="stylesheet" href="">
+<style>
+body {
+background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+margin: 0;
+font-family: 'Segoe UI', sans-serif;
+}
+.login-card {
+background: #ffffff;
+padding: 40px;
+border-radius: 20px;
+box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+width: 100%;
+max-width: 400px;
+text-align: center;
+}
+.main-icon { color: #2563eb; margin-bottom: 15px; }
+.form-control {
+border-radius: 50px;
+padding: 12px 20px;
+height: auto;
+border: 1px solid #e2e8f0;
+}
+.btn-login {
+background: #2563eb;
+color: white;
+border-radius: 50px;
+padding: 12px;
+font-weight: 600;
+width: 100%;
+border: none;
+transition: all 0.3s;
+margin-top: 10px;
+}
+.btn-login:hover {
+background: #1d4ed8;
+transform: translateY(-2px);
+box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+}
+</style>
 </head>
 <body>
 
-<h2>Giriş Yap</h2>
+<div class="login-card">
+<i class="fas fa-tools fa-4x main-icon"></i>
+<h2 style="font-weight: 700; color: #1e293b;">Servis Girişi</h2>
+<p style="color: #64748b; margin-bottom: 30px;">Araç Servis Randevu Sistemi</p>
 
-<?php
-if(isset($hata)){
-    echo "<p style='color:red;'>$hata</p>";
-}
-?>
+<form action="" method="POST">
+<div class="form-group text-left">
+<label style="margin-left: 15px; font-weight: 500;">Email Adresi</label>
+<input type="email" name="email" class="form-control" placeholder="admin@servis.com" required>
+</div>
+<div class="form-group text-left">
+<label style="margin-left: 15px; font-weight: 500;">Şifre</label>
+<input type="password" name="sifre" class="form-control" placeholder="••••••••" required>
+<button type="submit" name="giris" style="background: #2563eb; color: white; border-radius: 50px; padding: 12px; font-weight: 600; width: 100%; border: none; transition: all 0.3s; margin-top: 20px; cursor: pointer;">
+Sisteme Giriş Yap
+</button>
+</div>
 
-<form method="POST">
-    Email:<br>
-    <input type="email" name="email" required><br><br>
-
-    Şifre:<br>
-    <input type="password" name="sifre" required><br><br>
-
-    <br>
-    <a href="sifremi_unuttum.php">Şifremi Unuttum</a>
-
-    <button type="submit" name="giris">Giriş Yap</button>
 </form>
+
+<div style="margin-top: 20px;">
+<a href="sifre_unuttum.php" style="color: #64748b; text-decoration: none; font-size: 14px;">Şifremi Unuttum</a>
+</div>
+</div>
 
 </body>
 </html>
